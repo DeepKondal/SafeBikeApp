@@ -1,0 +1,196 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Bike Record</title>
+    <!-- Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+        background-color: #343a40;
+    }
+
+    .navbar-dark .navbar-brand,
+    .navbar-dark .navbar-nav .nav-link {
+        color: #fff;
+    }
+
+    .navbar-dark .navbar-toggler-icon {
+        background-color: #fff;
+    }
+
+    .navbar-nav .nav-item {
+        margin-right: 10px;
+    }
+
+    .navbar-nav .nav-link {
+        color: #fff;
+        transition: color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #007bff;
+    }
+
+    .btn-primary{
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-primary:hover,
+    .btn-danger:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        color: #fff;
+    }
+        .container {
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .recorded-values-box {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #3299ab;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="{% url 'home' %}">Safe Bike App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'location_history' %}">Location History</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mt-4">Interval Recording Page</h1>
+
+        <form method="get" action="{% url 'interval_recording' %}" class="mb-4">
+            <div class="form-group">
+                <label for="interval">Select Interval (in minutes): </label>
+                <select name="interval" id="interval" class="form-control" required>
+                    {% for interval_option in intervals %}
+                        <option value="{{ interval_option }}" {% if interval_option == selected_interval %}selected{% endif %}>{{ interval_option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-danger mr-2" onclick="stopRecording()">Stop Recording</button>
+        </form>
+
+        <div class="recorded-values-box">
+            <p class="mb-4">Selected Interval: {{ selected_interval }} minute(s)</p>
+
+            <ul id="recorded-values">
+                <!-- Values will be dynamically added here using JavaScript -->
+            </ul>
+        </div>
+
+        <input type="hidden" id="hidden-interval" value="{{ selected_interval }}">
+
+
+        <script>
+            const selectedInterval = parseInt(document.getElementById('hidden-interval').value, 10);
+            let currentIndex = 0;
+            const recordedValues = JSON.parse('{{ recorded_values|safe }}');
+            let intervalId; // Variable to store the interval ID
+        
+            function displayValues() {
+                const valuesList = document.getElementById('recorded-values');
+        
+                if (selectedInterval > 0 && currentIndex < recordedValues.length) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Latitude: ${recordedValues[currentIndex].latitude}, Longitude: ${recordedValues[currentIndex].longitude} - Date: ${recordedValues[currentIndex].date}`;
+                    valuesList.appendChild(listItem);
+        
+                    currentIndex++;
+        
+                    if (currentIndex < recordedValues.length && currentIndex <= selectedInterval * 12) {
+                        intervalId = setTimeout(displayValues, 5000);  // Display every 5 seconds
+                    }
+                }
+            }
+            function saveRecordedValue(value) {
+        // Send an AJAX request to save the recorded value within the interval_recording view
+        fetch('{% url "interval_recording" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify(value),
+        })
+        .then(response => response.json())
+        .then(data => console.log('Recorded value saved:', data))
+        .catch(error => console.error('Error saving recorded value:', error));
+    }
+
+    fetch('{% url "save_recorded_value" %}', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+    },
+    body: JSON.stringify(recordedValues[currentIndex]),
+})
+.then(response => response.json())
+.then(data => console.log('Recorded value saved:', data))
+.catch(error => console.error('Error saving recorded value:', error));
+            function stopRecording() {
+                // Clear the existing interval
+                clearInterval(intervalId);
+                // Set the interval to 0
+                
+            }
+        
+            // Call displayValues initially
+            displayValues();
+        </script>
+        
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

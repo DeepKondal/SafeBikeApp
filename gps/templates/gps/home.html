@@ -1,0 +1,145 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Bike</title>
+    <!-- Bootstrap CSS link -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+        background-color: #343a40;
+    }
+
+    .navbar-dark .navbar-brand,
+    .navbar-dark .navbar-nav .nav-link {
+        color: #fff;
+    }
+
+    .navbar-dark .navbar-toggler-icon {
+        background-color: #fff;
+    }
+
+    .navbar-nav .nav-item {
+        margin-right: 10px;
+    }
+
+    .navbar-nav .nav-link {
+        color: #fff;
+        transition: color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #007bff;
+    }
+
+    .btn-primary{
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+        transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .btn-primary:hover,
+    .btn-danger:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        color: #fff;
+    }
+        .container {
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        .recorded-values-box {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #3299ab;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="{% url 'home' %}">Safe Bike App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'interval_recording' %}">Interval Recording</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'location_history' %}">Location History</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+
+    <div class="container" style="padding-top: 10%;">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card custom-card">
+                    
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-left: 20%;text-shadow: #343a40;">Check bike status</h5>
+                        <p class="card-text">Check the current status of the bike.  Employing sensor fusion technology, the bike is equipped with advanced sensors like accelerometers, gyroscopes, and GPS modules. The backend processes real-time data, to determine if the bike is stationary or in motion. </p>
+                        <button type="button" style="margin-left: 25%;" class="btn btn-danger mr-3" onclick="alert('Sensors have detected some movement. Check your bike!!!')">Check status</button>
+                    </div>
+                </div>
+            </div>
+            <!-- You can add more card divs within the row and columns -->
+            <div class="col-md-4">
+                <div class="card custom-card">
+                    
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-left: 20%;text-shadow: #343a40;">Set recording interval</h5>
+                        <p class="card-text">The "Set Intervals" page is a crucial feature that empowers users to customize their GPS recording experience. By allowing users to choose specific intervals, they can tailor the recording time based on their preferences and needs. This flexibility enhances app usability .</p>
+                        <a type="button" style="margin-left: 25%; background-color: #3299ab;" class="btn mr-3" href="{% url 'interval_recording' %}">Interval Recording</a>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="col-md-4">
+                <div class="card custom-card">
+                    
+                    <div class="card-body">
+                        <h5 class="card-title" style="margin-left: 25%;text-shadow: #343a40;">Location History</h5>
+                        <p class="card-text">Go to our location history page that will tell us about all the past recorded location of our bike. NOTE: (It should be noted that we keep track of data only for one year and any data before that will be lost. So users are adviced to save it somehwere beforehand.)</p>
+                        <a type="button" style="margin-left: 25%; background-color: #3299ab;" class="btn mr-3" href="{% url 'location_history' %}">Location History</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
