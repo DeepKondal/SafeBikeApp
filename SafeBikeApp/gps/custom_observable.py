@@ -19,9 +19,9 @@ class Observer:
     def update(self, message):
         pass
 
-# Move LocationHistoryObserver class to the end of the file
 class LocationHistoryObserver(Observer):
     def update(self, recorded_values):
+        from .models import RecordedValue
         for value in recorded_values:
             RecordedValue.objects.create(
                 latitude=value['latitude'],

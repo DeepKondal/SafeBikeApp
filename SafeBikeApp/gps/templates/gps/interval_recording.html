@@ -131,61 +131,67 @@
 
         <script>
             const selectedInterval = parseInt(document.getElementById('hidden-interval').value, 10);
-            let currentIndex = 0;
-            const recordedValues = JSON.parse('{{ recorded_values|safe }}');
-            let intervalId; // Variable to store the interval ID
-        
-            function displayValues() {
-                const valuesList = document.getElementById('recorded-values');
-        
-                if (selectedInterval > 0 && currentIndex < recordedValues.length) {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Latitude: ${recordedValues[currentIndex].latitude}, Longitude: ${recordedValues[currentIndex].longitude} - Date: ${recordedValues[currentIndex].date}`;
-                    valuesList.appendChild(listItem);
-        
-                    currentIndex++;
-        
-                    if (currentIndex < recordedValues.length && currentIndex <= selectedInterval * 12) {
-                        intervalId = setTimeout(displayValues, 5000);  // Display every 5 seconds
-                    }
+    let currentIndex = 0;
+    const recordedValues = JSON.parse('{{ recorded_values|safe }}');
+    let intervalId; // Variable to store the interval ID
+
+    function displayValues() {
+        const valuesList = document.getElementById('recorded-values');
+        const selectedInterval = parseInt(document.getElementById('interval').value, 10);
+
+        if (selectedInterval > 0 && currentIndex < recordedValues.length) {
+            const currentLatitude = recordedValues[currentIndex].latitude;
+            const currentLongitude = recordedValues[currentIndex].longitude;
+
+            const listItem = document.createElement('li');
+            const currentDate = new Date(); // Get the current date and time
+            listItem.textContent = `Latitude: ${currentLatitude}, Longitude: ${currentLongitude} - Date: ${currentDate.toISOString()}`;
+            valuesList.appendChild(listItem);
+
+            currentIndex++;
+
+            if (currentIndex < recordedValues.length && currentIndex <= selectedInterval * 12) {
+                intervalId = setTimeout(displayValues, selectedInterval * 60000);
+                saveRecordedValue(recordedValues[currentIndex - 1], selectedInterval);
+            }
+
+            // Check for change in latitude or longitude
+            if (currentIndex > 1) {
+                const previousLatitude = recordedValues[currentIndex - 2].latitude;
+                const previousLongitude = recordedValues[currentIndex - 2].longitude;
+
+                if (currentLatitude !== previousLatitude || currentLongitude !== previousLongitude) {
+                    alert('Change Detected!!!');
                 }
             }
-            function saveRecordedValue(value) {
-        // Send an AJAX request to save the recorded value within the interval_recording view
-        fetch('{% url "interval_recording" %}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify(value),
-        })
-        .then(response => response.json())
-        .then(data => console.log('Recorded value saved:', data))
-        .catch(error => console.error('Error saving recorded value:', error));
+        }
     }
 
-    fetch('{% url "save_recorded_value" %}', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}',
-    },
-    body: JSON.stringify(recordedValues[currentIndex]),
-})
-.then(response => response.json())
-.then(data => console.log('Recorded value saved:', data))
-.catch(error => console.error('Error saving recorded value:', error));
+        
+            function saveRecordedValue(value) {
+                // Send an AJAX request to save the recorded value within the interval_recording view
+                fetch('{% url "save_recorded_value" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify(value),
+                })
+                .then(response => response.json())
+                .then(data => console.log('Recorded value saved:', data))
+                .catch(error => console.error('Error saving recorded value:', error));
+            }
+        
             function stopRecording() {
                 // Clear the existing interval
                 clearInterval(intervalId);
-                // Set the interval to 0
-                
             }
         
             // Call displayValues initially
             displayValues();
         </script>
+        
         
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

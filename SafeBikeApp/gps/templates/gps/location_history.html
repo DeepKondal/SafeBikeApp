@@ -102,8 +102,17 @@
 
         <div class="location-history-box">
             <ul>
-                {% for value in recorded_values %}
-                    <li>{{ value.latitude }}, {{ value.longitude }} - {{ value.date }}</li>
+                {% for value in recorded_values reversed %}
+                    <li>
+                        {% if value.date %}
+                            {{ value.date }} ----
+                        {% endif %}
+                        
+                        {{ value.latitude }}, {{ value.longitude }} 
+                        {% if value.changeDetected %}
+                            <span style="color: red;">Change Detected!</span>
+                        {% endif %}
+                    </li>
                 {% endfor %}
             </ul>
         </div>
